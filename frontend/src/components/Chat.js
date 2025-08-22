@@ -1,28 +1,35 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Box,
-  Paper,
   TextField,
-  IconButton,
+  Button,
+  Paper,
   Typography,
   Avatar,
+  IconButton,
+  Chip,
   CircularProgress,
+  Alert,
 } from '@mui/material';
-import {
-  Send as SendIcon,
-  Mic as MicIcon,
-  Stop as StopIcon,
-} from '@mui/icons-material';
-import axios from 'axios';
+import { Send, Mic, MicOff, Language } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-
-const Chat = ({ messages, onNewMessage, isVoiceMode }) => {
-  const [input, setInput] = useState('');
-  const [isRecording, setIsRecording] = useState(false);
+const Chat = () => {
+  const theme = useTheme();
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      text: "Hi! I'm Roomy, your cute AI assistant! 🏠 I can help you chat with your documents. Upload a document and start asking questions!",
+      sender: 'ai',
+      timestamp: new Date(),
+    },
+  ]);
+  const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
+  const [useVoice, setUseVoice] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
   const messagesEndRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -32,197 +39,209 @@ const Chat = ({ messages, onNewMessage, isVoiceMode }) => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const handleSendMessage = async () => {
+    if (!inputText.trim()) return;
 
     const userMessage = {
-      type: 'user',
-      content: input,
+      id: Date.now(),
+      text: inputText,
+      sender: 'user',
       timestamp: new Date(),
     };
 
-    onNewMessage(userMessage);
-    setInput('');
+    setMessages(prev => [...prev, userMessage]);
+    setInputText('');
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${API_URL}/ask`, {
-        text: input,
-        use_voice: isVoiceMode,
+      const response = await fetch('http://localhost:8000/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: inputText,
+          language: selectedLanguage,
+          use_voice: useVoice,
+        }),
       });
 
-      const aiMessage = {
-        type: 'ai',
-        content: response.data.text,
-        audio_url: response.data.audio_url,
-        timestamp: new Date(),
-      };
-
-      onNewMessage(aiMessage);
-
-      if (isVoiceMode && response.data.audio_url) {
-        const audio = new Audio(response.data.audio_url);
-        audio.play();
+      if (response.ok) {
+        const data = await response.json();
+        const aiMessage = {
+          id: Date.now() + 1,
+          text: data.response,
+          sender: 'ai',
+          timestamp: new Date(),
+          voice_url: data.voice_url,
+        };
+        setMessages(prev => [...prev, aiMessage]);
+      } else {
+        throw new Error('Failed to get response');
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      onNewMessage({
-        type: 'error',
-        content: 'Sorry, I had trouble processing that request.',
+      const errorMessage = {
+        id: Date.now() + 1,
+        text: "Sorry, I'm having trouble right now. Please try again! 😅",
+        sender: 'ai',
         timestamp: new Date(),
-      });
+      };
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      const audioChunks = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        audioChunks.push(event.data);
-      };
-
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunks);
-        const formData = new FormData();
-        formData.append('audio', audioBlob);
-
-        setIsLoading(true);
-        try {
-          const response = await axios.post(`${API_URL}/voice`, formData);
-          onNewMessage({
-            type: 'ai',
-            content: response.data.text,
-            audio_url: response.data.audio_url,
-            timestamp: new Date(),
-          });
-
-          if (response.data.audio_url) {
-            const audio = new Audio(response.data.audio_url);
-            audio.play();
-          }
-        } catch (error) {
-          console.error('Error processing voice:', error);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.start();
-      setIsRecording(true);
-    } catch (error) {
-      console.error('Error accessing microphone:', error);
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
   };
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
+  const toggleVoice = () => {
+    setUseVoice(!useVoice);
   };
 
-  const MessageBubble = ({ message }) => (
-    <Box
-      sx={{
-        display: 'flex',
-        gap: 1,
-        mb: 2,
-        justifyContent: message.type === 'user' ? 'flex-end' : 'flex-start',
-      }}
-    >
-      {message.type === 'ai' && (
-        <Avatar
-          src="/roomy-avatar.png"
-          alt="Roomy"
-          sx={{
-            width: 40,
-            height: 40,
-            bgcolor: 'primary.main',
-          }}
-        />
-      )}
-      <Paper
-        elevation={1}
-        sx={{
-          p: 2,
-          maxWidth: '70%',
-          bgcolor: message.type === 'user' ? 'primary.light' : 'background.paper',
-          borderRadius: 4,
-        }}
-      >
-        <Typography variant="body1">{message.content}</Typography>
-      </Paper>
-      {message.type === 'user' && (
-        <Avatar sx={{ bgcolor: 'secondary.main' }}>You</Avatar>
-      )}
-    </Box>
-  );
+  const getLanguageLabel = (lang) => {
+    return lang === 'en' ? 'English' : 'Hindi';
+  };
 
   return (
-    <Box
-      sx={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
-      }}
-    >
-      <Paper
-        elevation={0}
-        sx={{
-          flex: 1,
-          p: 2,
-          overflowY: 'auto',
-          bgcolor: 'background.default',
-        }}
-      >
-        {messages.map((message, index) => (
-          <MessageBubble key={index} message={message} />
-        ))}
-        <div ref={messagesEndRef} />
-      </Paper>
-
-      <Paper
-        elevation={1}
-        sx={{
-          p: 2,
-          display: 'flex',
-          gap: 1,
-          alignItems: 'center',
-        }}
-      >
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Type your message..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-          disabled={isLoading || isRecording}
-        />
-        {isVoiceMode && (
-          <IconButton
-            color={isRecording ? 'error' : 'primary'}
-            onClick={isRecording ? stopRecording : startRecording}
-            disabled={isLoading}
-          >
-            {isRecording ? <StopIcon /> : <MicIcon />}
-          </IconButton>
-        )}
-        <IconButton
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {/* Language and Voice Controls */}
+      <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', gap: 2, alignItems: 'center' }}>
+        <Chip
+          icon={<Language />}
+          label={getLanguageLabel(selectedLanguage)}
+          onClick={() => setSelectedLanguage(selectedLanguage === 'en' ? 'hi' : 'en')}
           color="primary"
-          onClick={handleSend}
-          disabled={isLoading || isRecording || !input.trim()}
+          variant="outlined"
+        />
+        <IconButton
+          onClick={toggleVoice}
+          color={useVoice ? 'primary' : 'default'}
+          title={useVoice ? 'Voice enabled' : 'Voice disabled'}
         >
-          {isLoading ? <CircularProgress size={24} /> : <SendIcon />}
+          {useVoice ? <Mic /> : <MicOff />}
         </IconButton>
-      </Paper>
+        {useVoice && (
+          <Typography variant="caption" color="text.secondary">
+            Voice features coming soon!
+          </Typography>
+        )}
+      </Box>
+
+      {/* Messages */}
+      <Box sx={{ flex: 1, overflow: 'auto', p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {messages.map((message) => (
+          <Box
+            key={message.id}
+            sx={{
+              display: 'flex',
+              justifyContent: message.sender === 'user' ? 'flex-end' : 'flex-start',
+              mb: 2,
+            }}
+          >
+            <Paper
+              sx={{
+                p: 2,
+                maxWidth: '70%',
+                backgroundColor: message.sender === 'user' 
+                  ? theme.palette.primary.main 
+                  : theme.palette.background.paper,
+                color: message.sender === 'user' 
+                  ? theme.palette.primary.contrastText 
+                  : theme.palette.text.primary,
+                borderRadius: 3,
+                position: 'relative',
+              }}
+            >
+              {message.sender === 'ai' && (
+                <Avatar
+                  src="/roomy-avatar.svg"
+                  alt="Roomy"
+                  sx={{
+                    width: 24,
+                    height: 24,
+                    position: 'absolute',
+                    top: -12,
+                    left: -12,
+                    bgcolor: 'primary.main',
+                  }}
+                />
+              )}
+              <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+                {message.text}
+              </Typography>
+              {message.voice_url && (
+                <Box sx={{ mt: 1 }}>
+                  <audio controls src={message.voice_url} style={{ width: '100%' }} />
+                </Box>
+              )}
+              <Typography
+                variant="caption"
+                sx={{
+                  display: 'block',
+                  mt: 1,
+                  opacity: 0.7,
+                  textAlign: 'right',
+                }}
+              >
+                {message.timestamp.toLocaleTimeString()}
+              </Typography>
+            </Paper>
+          </Box>
+        ))}
+        
+        {isLoading && (
+          <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2 }}>
+            <Paper sx={{ p: 2, borderRadius: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CircularProgress size={20} />
+                <Typography variant="body2">Roomy is thinking...</Typography>
+              </Box>
+            </Paper>
+          </Box>
+        )}
+        
+        <div ref={messagesEndRef} />
+      </Box>
+
+      {/* Input Area */}
+      <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <TextField
+            fullWidth
+            multiline
+            maxRows={4}
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder={`Ask me anything in ${getLanguageLabel(selectedLanguage)}...`}
+            variant="outlined"
+            size="small"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 3,
+              },
+            }}
+          />
+          <Button
+            variant="contained"
+            onClick={handleSendMessage}
+            disabled={!inputText.trim() || isLoading}
+            sx={{
+              borderRadius: 3,
+              minWidth: 56,
+              height: 40,
+            }}
+          >
+            <Send />
+          </Button>
+        </Box>
+      </Box>
     </Box>
   );
 };

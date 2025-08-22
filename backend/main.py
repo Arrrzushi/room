@@ -8,6 +8,8 @@ import uvicorn
 # Import our custom modules
 from room_rag.engine import RoomRAG
 from room_translate.translator import RoomTranslator
+
+# Import voice processor (simplified version)
 from room_voice.processor import RoomVoice
 
 app = FastAPI(
@@ -16,78 +18,117 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configure CORS
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with specific origins
+    allow_origins=["*"],  # In production, restrict this
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Mount static files directory
+# Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Initialize our components
+# Initialize components
 rag_engine = RoomRAG()
 translator = RoomTranslator()
 voice_processor = RoomVoice()
 
-class Query(BaseModel):
-    text: str
-    use_voice: Optional[bool] = False
+# Request/Response models
+class ChatRequest(BaseModel):
+    message: str
+    language: str = "en"
+    use_voice: bool = False
+
+class ChatResponse(BaseModel):
+    response: str
+    language: str
+    voice_url: Optional[str] = None
+
+class UploadResponse(BaseModel):
+    message: str
+    filename: str
+
+class ApiKeyRequest(BaseModel):
+    api_key: str
+    base_url: Optional[str] = None
+
+@app.get("/")
+async def root():
+    """Root endpoint."""
+    return {"message": "Welcome to Room AI Assistant! 🏠"}
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "message": "Room is ready to chat! 🐱"}
+    """Health check endpoint."""
+    return {
+        "status": "healthy",
+        "message": "Room AI Assistant is running smoothly!",
+        "services": {
+            "rag": "available",
+            "translation": "available", 
+            "voice": "basic" if voice_processor.is_available() else "coming_soon",
+            "openai": "available" if rag_engine.openai_client else "not_configured"
+        }
+    }
 
-@app.post("/upload")
-async def upload_document(file: UploadFile = File(...)):
+@app.post("/set-openai-key")
+async def set_openai_api_key(request: ApiKeyRequest):
+    """Set OpenAI API key for enhanced AI capabilities."""
     try:
-        contents = await file.read()
-        # Process and store document in RAG system
-        doc_id = await rag_engine.ingest(contents, file.filename)
-        return {"message": f"Document uploaded successfully! 📚", "doc_id": doc_id}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/ask")
-async def ask_question(query: Query):
-    try:
-        # Detect language and translate if needed
-        detected_lang = translator.detect_language(query.text)
-        
-        if detected_lang == "hi":
-            # Translate Hindi to English
-            english_query = translator.translate_to_english(query.text)
-            # Get RAG response
-            response = await rag_engine.query(english_query)
-            # Translate back to Hindi
-            final_response = translator.translate_to_hindi(response)
+        success = rag_engine.set_openai_api_key(request.api_key, request.base_url)
+        if success:
+            return {"message": "OpenAI API key set successfully! AI capabilities are now enhanced."}
         else:
-            # Process English query directly
-            final_response = await rag_engine.query(query.text)
-        
-        if query.use_voice:
-            # Generate voice response
-            audio_path = voice_processor.text_to_speech(final_response, lang=detected_lang)
-            return {"text": final_response, "audio_url": audio_path}
-        
-        return {"text": final_response}
+            raise HTTPException(status_code=400, detail="Failed to set OpenAI API key")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/voice")
-async def process_voice(audio: UploadFile = File(...)):
+@app.post("/upload", response_model=UploadResponse)
+async def upload_document(file: UploadFile = File(...)):
+    """Upload a document for processing."""
     try:
-        audio_data = await audio.read()
-        # Convert voice to text
-        text = voice_processor.speech_to_text(audio_data)
-        # Process the text query using /ask endpoint
-        query = Query(text=text, use_voice=True)
-        return await ask_question(query)
+        # Process the uploaded file
+        result = await rag_engine.process_document(file)
+        return UploadResponse(
+            message="Document processed successfully!",
+            filename=file.filename
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/chat", response_model=ChatResponse)
+async def chat_with_documents(request: ChatRequest):
+    """Chat with the uploaded documents."""
+    try:
+        # Get response from RAG engine
+        response = await rag_engine.get_response(request.message, request.language)
+        
+        # Translate if needed
+        if request.language == "hi":
+            response = translator.translate(response, "en", "hi")
+        
+        # Generate voice if requested
+        voice_url = None
+        if request.use_voice and voice_processor.is_available():
+            voice_url = voice_processor.text_to_speech(response, request.language)
+        
+        return ChatResponse(
+            response=response,
+            language=request.language,
+            voice_url=voice_url
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/languages")
+async def get_supported_languages():
+    """Get supported languages."""
+    return {
+        "translation": translator.get_supported_languages(),
+        "voice": voice_processor.get_supported_languages()
+    }
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

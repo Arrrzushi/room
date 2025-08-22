@@ -1,180 +1,80 @@
-import os
-from pathlib import Path
-import torch
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, pipeline
-import regex as re
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 class RoomTranslator:
     """
-    Room's multilingual translation engine using IndicTrans2.
+    Room's translation engine - simplified version.
     """
     
     def __init__(self):
-        """Initialize the translator with necessary models."""
-        # Initialize models path
-        self.models_path = Path("room_translate/models")
-        self.models_path.mkdir(parents=True, exist_ok=True)
-        
-        # Initialize translation models
-        self.en2hi_model = None
-        self.hi2en_model = None
-        self.en2hi_tokenizer = None
-        self.hi2en_tokenizer = None
-        
-        # Initialize language detection
-        self.lang_detector = pipeline("text-classification", model="papluca/xlm-roberta-base-language-detection")
-        
-        # Regex patterns for text normalization
-        self.patterns = {
-            "multiple_spaces": re.compile(r"\s+"),
-            "spaces_around_punctuation": re.compile(r"\s*([,.!?])\s*"),
-            "normalize_quotes": re.compile(r'["""]'),
-            "normalize_apostrophes": re.compile(r"['']"),
-            "devanagari": re.compile(r'[\u0900-\u097F]'),
+        """Initialize the translator."""
+        # Simple translation dictionary for common phrases
+        self.translations = {
+            "hello": "नमस्ते",
+            "how are you": "कैसे हो आप",
+            "thank you": "धन्यवाद",
+            "goodbye": "अलविदा",
+            "yes": "हाँ",
+            "no": "नहीं",
+            "please": "कृपया",
+            "sorry": "माफ़ कीजिए",
+            "welcome": "स्वागत है",
+            "good morning": "सुप्रभात",
+            "good night": "शुभ रात्रि"
         }
-
-    def _load_en2hi_model(self):
-        """Load English to Hindi translation model."""
-        if self.en2hi_model is None:
-            model_name = "ai4bharat/indictrans2-en-indic-dist-200M"
-            self.en2hi_tokenizer = AutoTokenizer.from_pretrained(model_name)
-            self.en2hi_model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
-            self.en2hi_model.eval()
-            if torch.cuda.is_available():
-                self.en2hi_model.to("cuda")
-
-    def _load_hi2en_model(self):
-        """Load Hindi to English translation model."""
-        if self.hi2en_model is None:
-            model_name = "ai4bharat/indictrans2-indic-en-dist-200M"
-            self.hi2en_tokenizer = AutoTokenizer.from_pretrained(model_name)
-            self.hi2en_model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
-            self.hi2en_model.eval()
-            if torch.cuda.is_available():
-                self.hi2en_model.to("cuda")
-
-    def _normalize_text(self, text: str) -> str:
-        """Normalize text by cleaning up spaces and punctuation."""
-        text = text.strip()
-        text = self.patterns["multiple_spaces"].sub(" ", text)
-        text = self.patterns["spaces_around_punctuation"].sub(r"\1 ", text)
-        text = self.patterns["normalize_quotes"].sub('"', text)
-        text = self.patterns["normalize_apostrophes"].sub("'", text)
-        return text.strip()
-
-    def detect_language(self, text: str) -> str:
+        
+        print("Translator initialized (basic mode)")
+    
+    def translate(self, text: str, source_lang: str = "en", target_lang: str = "hi") -> str:
         """
-        Detect the language of input text.
-        
-        Args:
-            text: Input text to detect language
-            
-        Returns:
-            str: Language code ('en' or 'hi')
-        """
-        # First try using Devanagari script detection
-        if self.patterns["devanagari"].search(text):
-            return 'hi'
-            
-        # Fallback to model-based detection
-        result = self.lang_detector(text)[0]
-        lang_code = result['label'].lower()
-        
-        # Map language codes
-        if lang_code in ['hin', 'hi', 'hindi']:
-            return 'hi'
-        return 'en'
-
-    def translate_to_english(self, text: str) -> str:
-        """
-        Translate Hindi text to English.
-        
-        Args:
-            text: Hindi text to translate
-            
-        Returns:
-            str: English translation
-        """
-        if self.detect_language(text) == 'en':
-            return text
-            
-        self._load_hi2en_model()
-        
-        # Normalize input text
-        text = self._normalize_text(text)
-        
-        # Prepare input
-        inputs = self.hi2en_tokenizer(text, return_tensors="pt", padding=True)
-        if torch.cuda.is_available():
-            inputs = {k: v.to("cuda") for k, v in inputs.items()}
-            
-        # Generate translation
-        with torch.no_grad():
-            outputs = self.hi2en_model.generate(**inputs, max_length=512)
-            
-        # Decode and normalize translation
-        translation = self.hi2en_tokenizer.decode(outputs[0], skip_special_tokens=True)
-        return self._normalize_text(translation)
-
-    def translate_to_hindi(self, text: str) -> str:
-        """
-        Translate English text to Hindi.
-        
-        Args:
-            text: English text to translate
-            
-        Returns:
-            str: Hindi translation
-        """
-        if self.detect_language(text) == 'hi':
-            return text
-            
-        self._load_en2hi_model()
-        
-        # Normalize input text
-        text = self._normalize_text(text)
-        
-        # Prepare input
-        inputs = self.en2hi_tokenizer(text, return_tensors="pt", padding=True)
-        if torch.cuda.is_available():
-            inputs = {k: v.to("cuda") for k, v in inputs.items()}
-            
-        # Generate translation
-        with torch.no_grad():
-            outputs = self.en2hi_model.generate(**inputs, max_length=512)
-            
-        # Decode and normalize translation
-        translation = self.en2hi_tokenizer.decode(outputs[0], skip_special_tokens=True)
-        return self._normalize_text(translation)
-
-    def translate(self, text: str, target_lang: str) -> str:
-        """
-        Translate text to target language.
+        Translate text between languages.
         
         Args:
             text: Text to translate
-            target_lang: Target language code ('en' or 'hi')
+            source_lang: Source language code
+            target_lang: Target language code
             
         Returns:
             str: Translated text
         """
-        if target_lang == 'en':
-            return self.translate_to_english(text)
-        elif target_lang == 'hi':
-            return self.translate_to_hindi(text)
-        else:
-            raise ValueError(f"Unsupported target language: {target_lang}")
-
-    def batch_translate(self, texts: List[str], target_lang: str) -> List[str]:
-        """
-        Translate a batch of texts to target language.
+        try:
+            if source_lang == "en" and target_lang == "hi":
+                return self._english_to_hindi(text)
+            elif source_lang == "hi" and target_lang == "en":
+                return self._hindi_to_english(text)
+            else:
+                return f"Translation from {source_lang} to {target_lang} not yet supported"
+                
+        except Exception as e:
+            return f"Translation error: {str(e)}"
+    
+    def _english_to_hindi(self, text: str) -> str:
+        """Translate English to Hindi (basic implementation)."""
+        text_lower = text.lower()
         
-        Args:
-            texts: List of texts to translate
-            target_lang: Target language code ('en' or 'hi')
-            
-        Returns:
-            List[str]: List of translated texts
-        """
-        return [self.translate(text, target_lang) for text in texts]
+        # Check for exact matches
+        for english, hindi in self.translations.items():
+            if english in text_lower:
+                return f"{text} ({hindi})"
+        
+        # For now, return the original text with a note
+        return f"{text} (Hindi translation coming soon!)"
+    
+    def _hindi_to_english(self, text: str) -> str:
+        """Translate Hindi to English (basic implementation)."""
+        # For now, return the original text with a note
+        return f"{text} (English translation coming soon!)"
+    
+    def get_supported_languages(self) -> Dict[str, str]:
+        """Get supported languages."""
+        return {
+            "en": "English",
+            "hi": "Hindi (basic support)"
+        }
+    
+    def detect_language(self, text: str) -> str:
+        """Detect the language of the text."""
+        # Simple detection based on Devanagari script
+        if any('\u0900' <= char <= '\u097F' for char in text):
+            return "hi"
+        else:
+            return "en"

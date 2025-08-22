@@ -1,32 +1,32 @@
-# Core dependencies
+# Core dependencies - minimal working set
 fastapi==0.104.1
 uvicorn==0.24.0
 python-multipart==0.0.6
 pydantic==2.5.1
 python-dotenv==1.0.0
 
-# RAG dependencies
+# Essential RAG dependencies (CPU only)
 faiss-cpu==1.7.4
 sentence-transformers==2.2.2
-numpy==1.21.6
+numpy==1.24.3
+
+# PDF processing
+PyPDF2==3.0.1
+
+# OpenAI integration (compatible version)
+openai>=1.0.0,<2.0.0
+
+# Lightweight PyTorch (CPU only, no CUDA)
 --find-links https://download.pytorch.org/whl/torch_stable.html
-torch==2.1.0+cpu
-torchvision==0.16.0+cpu
-torchaudio==2.1.0+cpu
-transformers==4.30.2
+torch==1.13.1+cpu
+torchvision==0.14.1+cpu
+torchaudio==0.13.1+cpu
 
-# Translation dependencies
-indic-nlp-library==0.92
-sacremoses==0.0.53
-sentencepiece==0.1.99
-regex==2023.10.3
-
-# Voice processing (CPU versions)
-openai-whisper==20231117
-TTS==0.21.3
-soundfile==0.13.1
-
-# Utilities
-loguru==0.7.2
-tqdm==4.66.1
+# Basic utilities
 requests==2.31.0
+loguru==0.7.2
+
+# Optional: Add these later if needed
+# transformers==4.30.2
+# TTS==0.22.0
+# openai-whisper==20231117

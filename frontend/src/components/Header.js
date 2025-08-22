@@ -24,7 +24,7 @@ const Header = ({ isVoiceMode, onVoiceToggle }) => {
       <Toolbar>
         <Box
           component="img"
-          src="/roomy-logo.png"
+          src="/roomy-logo.svg"
           alt="Roomy"
           sx={{
             height: 40,

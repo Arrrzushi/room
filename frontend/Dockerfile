@@ -1,4 +1,5 @@
-FROM node:18-alpine
+# Build stage
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
@@ -17,11 +18,17 @@ RUN mkdir -p public/static/audio
 # Build the application
 RUN npm run build
 
-# Install serve to run the application
-RUN npm install -g serve
+# Production stage
+FROM nginx:alpine
 
-# Expose the port
+# Copy the built application from builder stage
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose port 3000
 EXPOSE 3000
 
-# Start the application
-CMD ["serve", "-s", "build", "-l", "3000"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
