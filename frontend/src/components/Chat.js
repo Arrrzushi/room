@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { Send as SendIcon, Upload as UploadIcon } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import API_BASE from '../config';
 
 const ChatContainer = styled(Box)(({ theme }) => ({
   background: '#242424',
@@ -146,7 +147,7 @@ const Chat = ({ uploadedFiles }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/chat', {
+      const response = await fetch(`${API_BASE}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

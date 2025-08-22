@@ -111,22 +111,22 @@ git push
 ## 🔗 **Connect Frontend to Backend**
 
 ### **Update API URL**
-After deploying backend, update your frontend:
+The frontend is now configured to automatically use environment variables! 
 
-```javascript
-// In frontend/src/components/Chat.js and FileUpload.js
-// Change from:
-const response = await fetch('http://localhost:8000/chat', {
+#### **For Vercel Deployment:**
+1. In your Vercel project settings, go to "Environment Variables"
+2. Add a new variable:
+   - **Name**: `REACT_APP_API_URL`
+   - **Value**: `https://your-backend-url.railway.app`
+3. Redeploy your project
 
-// To:
-const response = await fetch('https://your-backend-url.railway.app/chat', {
-```
-
-### **Environment Variables**
-Create `.env` file in frontend:
+#### **For Local Development:**
+Create a `.env` file in the `frontend` folder:
 ```bash
 REACT_APP_API_URL=https://your-backend-url.railway.app
 ```
+
+**Note**: If no environment variable is set, it will automatically fall back to `http://localhost:8000` for local development.
 
 ## 📱 **Update Your GitHub Profile**
 

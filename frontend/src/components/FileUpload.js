@@ -21,6 +21,7 @@ import {
   Error as ErrorIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import API_BASE from '../config';
 
 const UploadContainer = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -76,7 +77,7 @@ const FileUpload = ({ onFilesUploaded }) => {
         const formData = new FormData();
         formData.append('file', file);
 
-        const response = await fetch('http://localhost:8000/upload', {
+        const response = await fetch(`${API_BASE}/upload`, {
           method: 'POST',
           body: formData,
         });
