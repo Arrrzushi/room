@@ -23,34 +23,38 @@ import {
 import { styled } from '@mui/material/styles';
 
 const UploadContainer = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  background: '#1a1a2e',
-  border: '2px dashed #334155',
+  padding: theme.spacing(4),
+  background: '#242424',
+  border: '2px dashed #374151',
   borderRadius: '12px',
   textAlign: 'center',
   transition: 'all 0.3s ease',
   cursor: 'pointer',
+  height: '224px',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
   '&:hover': {
-    borderColor: '#6366f1',
-    background: '#16213e',
+    borderColor: '#6B7280',
+    background: '#1F1F1F',
   },
   '&.drag-active': {
-    borderColor: '#8b5cf6',
-    background: '#16213e',
-    transform: 'scale(1.02)',
+    borderColor: '#9CA3AF',
+    background: '#1F1F1F',
   },
 }));
 
 const UploadIcon = styled(CloudUploadIcon)(({ theme }) => ({
-  fontSize: '4rem',
-  color: '#6366f1',
+  fontSize: '3rem',
+  color: '#6B7280',
   marginBottom: theme.spacing(2),
 }));
 
 const FileList = styled(Paper)(({ theme }) => ({
   marginTop: theme.spacing(3),
-  background: '#1a1a2e',
-  border: '1px solid #334155',
+  background: '#242424',
+  border: '1px solid #374151',
   borderRadius: '12px',
   overflow: 'hidden',
 }));
@@ -133,19 +137,19 @@ const FileUpload = ({ onFilesUploaded }) => {
   };
 
   const getFileIcon = (fileType) => {
-    if (fileType.includes('pdf')) return <DescriptionIcon sx={{ color: '#ef4444' }} />;
-    if (fileType.includes('word') || fileType.includes('document')) return <DescriptionIcon sx={{ color: '#3b82f6' }} />;
-    return <DescriptionIcon sx={{ color: '#10b981' }} />;
+    if (fileType.includes('pdf')) return <DescriptionIcon sx={{ color: '#EF4444' }} />;
+    if (fileType.includes('word') || fileType.includes('document')) return <DescriptionIcon sx={{ color: '#3B82F6' }} />;
+    return <DescriptionIcon sx={{ color: '#10B981' }} />;
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
       case 'success':
-        return <CheckCircleIcon sx={{ color: '#10b981' }} />;
+        return <CheckCircleIcon sx={{ color: '#10B981' }} />;
       case 'error':
-        return <ErrorIcon sx={{ color: '#ef4444' }} />;
+        return <ErrorIcon sx={{ color: '#EF4444' }} />;
       default:
-        return <CircularProgress size={20} sx={{ color: '#6366f1' }} />;
+        return <CircularProgress size={20} sx={{ color: '#6B7280' }} />;
     }
   };
 
@@ -166,21 +170,18 @@ const FileUpload = ({ onFilesUploaded }) => {
       >
         <input {...getInputProps()} />
         <UploadIcon />
-        <Typography variant="h6" sx={{ color: '#f8fafc', mb: 1, fontWeight: 600 }}>
-          {isDragActive ? 'Drop files here' : 'Upload Documents'}
+        <Typography variant="h6" sx={{ color: '#6B7280', mb: 1, fontWeight: 500 }}>
+          {isDragActive ? 'Drop files here' : 'Drop Files Here'}
         </Typography>
-        <Typography variant="body2" sx={{ color: '#94a3b8', mb: 2 }}>
-          Drag & drop your documents here, or click to browse
-        </Typography>
-        <Typography variant="caption" sx={{ color: '#64748b' }}>
+        <Typography variant="body2" sx={{ color: '#9CA3AF', fontSize: '0.875rem' }}>
           Supported formats: PDF, TXT, DOC, DOCX
         </Typography>
         
         {uploading && (
           <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-            <CircularProgress size={20} sx={{ color: '#6366f1' }} />
-            <Typography variant="body2" sx={{ color: '#94a3b8' }}>
-              Processing documents...
+            <CircularProgress size={20} sx={{ color: '#6B7280' }} />
+            <Typography variant="body2" sx={{ color: '#9CA3AF', fontSize: '0.875rem' }}>
+              Processing...
             </Typography>
           </Box>
         )}
@@ -188,11 +189,11 @@ const FileUpload = ({ onFilesUploaded }) => {
 
       {uploadedFiles.length > 0 && (
         <FileList>
-          <Box sx={{ p: 2, background: '#16213e', borderBottom: '1px solid #334155' }}>
-            <Typography variant="h6" sx={{ color: '#f8fafc', fontWeight: 600 }}>
+          <Box sx={{ p: 2, background: '#1F1F1F', borderBottom: '1px solid #374151' }}>
+            <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
               Uploaded Documents
             </Typography>
-            <Typography variant="body2" sx={{ color: '#94a3b8', mt: 0.5 }}>
+            <Typography variant="body2" sx={{ color: '#9CA3AF', mt: 0.5, fontSize: '0.875rem' }}>
               {uploadedFiles.filter(f => f.status === 'success').length} document(s) ready for analysis
             </Typography>
           </Box>
@@ -202,16 +203,16 @@ const FileUpload = ({ onFilesUploaded }) => {
               <ListItem
                 key={index}
                 sx={{
-                  borderBottom: index < uploadedFiles.length - 1 ? '1px solid #334155' : 'none',
+                  borderBottom: index < uploadedFiles.length - 1 ? '1px solid #374151' : 'none',
                   '&:hover': {
-                    background: '#16213e',
+                    background: '#1F1F1F',
                   },
                 }}
                 secondaryAction={
                   <IconButton
                     edge="end"
                     onClick={() => removeFile(file.name)}
-                    sx={{ color: '#64748b' }}
+                    sx={{ color: '#6B7280' }}
                   >
                     <DeleteIcon />
                   </IconButton>
@@ -222,13 +223,13 @@ const FileUpload = ({ onFilesUploaded }) => {
                 </ListItemIcon>
                 <ListItemText
                   primary={
-                    <Typography variant="body1" sx={{ color: '#f8fafc', fontWeight: 500 }}>
+                    <Typography variant="body1" sx={{ color: 'white', fontWeight: 500 }}>
                       {file.name}
                     </Typography>
                   }
                   secondary={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                      <Typography variant="caption" sx={{ color: '#64748b' }}>
+                      <Typography variant="caption" sx={{ color: '#9CA3AF' }}>
                         {formatFileSize(file.size)}
                       </Typography>
                       <Chip
@@ -237,8 +238,8 @@ const FileUpload = ({ onFilesUploaded }) => {
                         icon={getStatusIcon(file.status)}
                         sx={{
                           background: file.status === 'success' 
-                            ? 'linear-gradient(135deg, #10b981, #059669)' 
-                            : 'linear-gradient(135deg, #ef4444, #dc2626)',
+                            ? '#10B981' 
+                            : '#EF4444',
                           color: 'white',
                           fontWeight: 500,
                           fontSize: '0.7rem',
@@ -258,11 +259,11 @@ const FileUpload = ({ onFilesUploaded }) => {
           severity="error" 
           sx={{ 
             mt: 2,
-            background: '#1e293b',
-            border: '1px solid #ef4444',
-            color: '#fca5a5',
+            background: '#1F1F1F',
+            border: '1px solid #EF4444',
+            color: '#FCA5A5',
             '& .MuiAlert-icon': {
-              color: '#ef4444',
+              color: '#EF4444',
             },
           }}
         >

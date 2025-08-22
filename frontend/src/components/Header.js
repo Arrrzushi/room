@@ -3,52 +3,89 @@ import { AppBar, Toolbar, Typography, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  background: 'linear-gradient(90deg, #1a1a2e 0%, #16213e 100%)',
-  borderBottom: '1px solid #334155',
-  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+  background: '#1B1B1B',
+  borderBottom: '1px solid #374151',
+  boxShadow: 'none',
 }));
 
-const LogoText = styled(Typography)(({ theme }) => ({
-  background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  backgroundClip: 'text',
-  fontWeight: 900,
-  letterSpacing: '0.1em',
-  textShadow: '0 0 20px rgba(99, 102, 241, 0.3)',
-}));
+const LogoContainer = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+});
+
+const Logo = styled('img')({
+  height: '32px',
+  width: 'auto',
+});
 
 const Header = () => {
   return (
     <StyledAppBar position="static" elevation={0}>
-      <Toolbar>
-        <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-          <LogoText variant="h4" component="div">
-            NEXUS
-          </LogoText>
+      <Toolbar sx={{ px: 5, py: 3 }}>
+        <LogoContainer sx={{ flexGrow: 1 }}>
+          <Logo src="/LOGO.jpg" alt="NEXUS" />
           <Typography 
-            variant="subtitle1" 
+            variant="h4" 
+            component="div"
             sx={{ 
-              ml: 2, 
-              color: '#94a3b8',
-              fontWeight: 300,
-              letterSpacing: '0.05em'
+              color: 'white',
+              fontWeight: 700,
+              letterSpacing: '0.1em',
             }}
           >
-            Intelligent Document Analysis Platform
+            NEXUS
           </Typography>
-        </Box>
+        </LogoContainer>
         
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Typography 
             variant="body2" 
             sx={{ 
-              color: '#64748b',
+              color: '#9CA3AF',
               fontWeight: 400,
-              letterSpacing: '0.05em'
+              cursor: 'pointer',
+              '&:hover': { color: 'white' },
+              transition: 'color 0.2s ease',
             }}
           >
-            "NEXUS for your queries"
+            About
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#9CA3AF',
+              fontWeight: 400,
+              cursor: 'pointer',
+              '&:hover': { color: 'white' },
+              transition: 'color 0.2s ease',
+            }}
+          >
+            Features
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#9CA3AF',
+              fontWeight: 400,
+              cursor: 'pointer',
+              '&:hover': { color: 'white' },
+              transition: 'color 0.2s ease',
+            }}
+          >
+            Docs
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#9CA3AF',
+              fontWeight: 400,
+              cursor: 'pointer',
+              '&:hover': { color: 'white' },
+              transition: 'color 0.2s ease',
+            }}
+          >
+            Contact
           </Typography>
         </Box>
       </Toolbar>

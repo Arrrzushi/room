@@ -115,7 +115,7 @@ class RoomRAG:
             chunks.append(' '.join(current_chunk))
         
         return chunks
-    
+
     async def process_document(self, file) -> str:
         """Process an uploaded document."""
         try:
@@ -146,7 +146,7 @@ class RoomRAG:
             
             # Store document
             doc_info = {
-                "filename": filename,
+                    "filename": filename,
                 "content": cleaned_text,
                 "chunks": chunks,
                 "size": len(content),
@@ -160,7 +160,7 @@ class RoomRAG:
             
         except Exception as e:
             raise Exception(f"Error processing document: {str(e)}")
-    
+
     def find_relevant_chunks(self, query: str, top_k: int = 5) -> List[str]:
         """Find the most relevant text chunks for a query using improved relevance scoring."""
         query_lower = query.lower()
@@ -296,7 +296,7 @@ Please provide a clear, helpful answer based on the document content above. If t
             else:
                 response = self._fallback_response(query, relevant_chunks)
                 return response
-                
+            
         except Exception as e:
             return f"Sorry, I encountered an error: {str(e)}"
     

@@ -8,8 +8,7 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemAvatar,
-  Avatar,
+  ListItemIcon,
   IconButton,
   Chip,
   Divider,
@@ -18,12 +17,13 @@ import { Send as SendIcon, Upload as UploadIcon } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 
 const ChatContainer = styled(Box)(({ theme }) => ({
-  height: '600px',
+  background: '#242424',
+  border: '1px solid #374151',
+  borderRadius: '12px',
+  height: '80vh', // Use viewport height to make it much bigger
+  minHeight: '600px', // Minimum height fallback
   display: 'flex',
   flexDirection: 'column',
-  background: '#1a1a2e',
-  border: '1px solid #334155',
-  borderRadius: '12px',
   overflow: 'hidden',
 }));
 
@@ -31,15 +31,15 @@ const MessagesContainer = styled(Box)(({ theme }) => ({
   flex: 1,
   overflowY: 'auto',
   padding: theme.spacing(2),
-  background: '#0f0f23',
+  background: '#1F1F1F',
   '&::-webkit-scrollbar': {
     width: '8px',
   },
   '&::-webkit-scrollbar-track': {
-    background: '#1a1a2e',
+    background: '#242424',
   },
   '&::-webkit-scrollbar-thumb': {
-    background: '#334155',
+    background: '#374151',
     borderRadius: '4px',
   },
 }));
@@ -53,21 +53,16 @@ const MessageBubble = styled(Box)(({ theme, isUser }) => ({
 const MessageContent = styled(Box)(({ theme, isUser }) => ({
   maxWidth: '70%',
   padding: theme.spacing(2),
-  borderRadius: '16px',
-  background: isUser 
-    ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' 
-    : '#1a1a2e',
-  color: isUser ? 'white' : '#f8fafc',
-  border: isUser ? 'none' : '1px solid #334155',
-  boxShadow: isUser 
-    ? '0 4px 20px rgba(99, 102, 241, 0.3)' 
-    : '0 2px 10px rgba(0, 0, 0, 0.2)',
+  borderRadius: '12px',
+  background: isUser ? 'white' : '#374151',
+  color: isUser ? 'black' : 'white',
+  border: isUser ? 'none' : '1px solid #4B5563',
 }));
 
 const InputContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
-  background: '#1a1a2e',
-  borderTop: '1px solid #334155',
+  background: '#1F1F1F',
+  borderTop: '1px solid #374151',
   display: 'flex',
   gap: theme.spacing(1),
 }));
@@ -75,20 +70,20 @@ const InputContainer = styled(Box)(({ theme }) => ({
 const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
     '& fieldset': {
-      borderColor: '#334155',
+      borderColor: '#374151',
     },
     '&:hover fieldset': {
-      borderColor: '#6366f1',
+      borderColor: '#6B7280',
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#8b5cf6',
+      borderColor: '#9CA3AF',
     },
   },
   '& .MuiInputBase-input': {
-    color: '#f8fafc',
+    color: 'white',
   },
   '& .MuiInputLabel-root': {
-    color: '#94a3b8',
+    color: '#9CA3AF',
   },
 }));
 
@@ -101,6 +96,22 @@ const Chat = ({ uploadedFiles }) => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Function to format AI responses for better readability
+  const formatAIResponse = (text) => {
+    if (!text) return text;
+    
+    // Add line breaks before bullet points and numbered lists
+    let formatted = text
+      .replace(/(\d+\.\s)/g, '\n$1') // Add line break before numbered lists
+      .replace(/([-•]\s)/g, '\n$1') // Add line break before bullet points
+      .replace(/(\*\*[^*]+\*\*)/g, '\n$1') // Add line break before bold text
+      .replace(/(##\s)/g, '\n\n$1') // Add double line break before headers
+      .replace(/(\n\s*\n)/g, '\n\n') // Clean up multiple line breaks
+      .trim();
+    
+    return formatted;
   };
 
   useEffect(() => {
@@ -180,11 +191,11 @@ const Chat = ({ uploadedFiles }) => {
 
   return (
     <ChatContainer>
-      <Box sx={{ p: 2, background: '#1a1a2e', borderBottom: '1px solid #334155' }}>
-        <Typography variant="h6" sx={{ color: '#f8fafc', fontWeight: 600 }}>
+      <Box sx={{ p: 2, background: '#1F1F1F', borderBottom: '1px solid #374151' }}>
+        <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
           Document Analysis
         </Typography>
-        <Typography variant="body2" sx={{ color: '#94a3b8', mt: 0.5 }}>
+        <Typography variant="body2" sx={{ color: '#9CA3AF', mt: 0.5, fontSize: '0.875rem' }}>
           Ask NEXUS about your uploaded documents
         </Typography>
         
@@ -197,9 +208,10 @@ const Chat = ({ uploadedFiles }) => {
                 label={file.name}
                 size="small"
                 sx={{
-                  background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                  color: 'white',
+                  background: 'white',
+                  color: 'black',
                   fontWeight: 500,
+                  fontSize: '0.75rem',
                 }}
               />
             ))}
@@ -210,10 +222,10 @@ const Chat = ({ uploadedFiles }) => {
       <MessagesContainer>
         {messages.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 4 }}>
-            <Typography variant="h6" sx={{ color: '#94a3b8', mb: 1 }}>
+            <Typography variant="h6" sx={{ color: '#9CA3AF', mb: 1 }}>
               Welcome to NEXUS
             </Typography>
-            <Typography variant="body2" sx={{ color: '#64748b' }}>
+            <Typography variant="body2" sx={{ color: '#6B7280', fontSize: '0.875rem' }}>
               Upload documents and start asking questions to get intelligent insights.
             </Typography>
           </Box>
@@ -223,15 +235,16 @@ const Chat = ({ uploadedFiles }) => {
               <ListItem key={message.id} sx={{ padding: 0 }}>
                 <MessageBubble isUser={message.isUser}>
                   <MessageContent isUser={message.isUser}>
-                    <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
-                      {message.text}
+                    <Typography variant="body1" sx={{ lineHeight: 1.6, fontSize: '0.875rem', whiteSpace: 'pre-line' }}>
+                      {message.isUser ? message.text : formatAIResponse(message.text)}
                     </Typography>
                     <Typography 
                       variant="caption" 
                       sx={{ 
-                        color: message.isUser ? 'rgba(255,255,255,0.7)' : '#64748b',
+                        color: message.isUser ? 'rgba(0,0,0,0.6)' : '#9CA3AF',
                         mt: 1,
-                        display: 'block'
+                        display: 'block',
+                        fontSize: '0.75rem',
                       }}
                     >
                       {message.timestamp.toLocaleTimeString()}
@@ -244,7 +257,7 @@ const Chat = ({ uploadedFiles }) => {
               <ListItem sx={{ padding: 0 }}>
                 <MessageBubble isUser={false}>
                   <MessageContent isUser={false}>
-                    <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+                    <Typography variant="body2" sx={{ color: '#9CA3AF', fontSize: '0.875rem' }}>
                       NEXUS is analyzing your request...
                     </Typography>
                   </MessageContent>
@@ -267,26 +280,28 @@ const Chat = ({ uploadedFiles }) => {
           disabled={isLoading}
           multiline
           maxRows={3}
+          size="small"
         />
         <Button
           variant="contained"
           onClick={handleSend}
           disabled={!input.trim() || isLoading}
           sx={{
-            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-            color: 'white',
+            background: 'white',
+            color: 'black',
             px: 3,
             minWidth: 'auto',
+            borderRadius: '8px',
             '&:hover': {
-              background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
+              background: '#E5E7EB',
             },
             '&:disabled': {
-              background: '#334155',
-              color: '#64748b',
+              background: '#374151',
+              color: '#6B7280',
             },
           }}
         >
-          <SendIcon />
+          ➤
         </Button>
       </InputContainer>
     </ChatContainer>

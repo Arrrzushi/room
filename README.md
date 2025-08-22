@@ -1,175 +1,198 @@
-# NEXUS - Intelligent Document Analysis Platform
+# 🚀 NEXUS - Intelligent Document Analysis Platform
 
-A sophisticated AI-powered document analysis and retrieval system designed for professionals who demand intelligent insights from their documents.
+A minimal, modern AI-powered platform for intelligent document analysis and insights.
+
+![NEXUS Platform](https://img.shields.io/badge/NEXUS-Platform-blue?style=for-the-badge&logo=github)
+![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue?style=for-the-badge&logo=docker)
 
 ## ✨ Features
 
-- **Advanced Document Processing**: Support for PDF, TXT, DOC, DOCX with intelligent text extraction
-- **AI-Powered Analysis**: GPT-4 powered responses that understand context and provide meaningful insights
-- **Multilingual Support**: English and Hindi language processing capabilities
-- **Smart RAG Engine**: Retrieval-Augmented Generation for accurate, context-aware responses
-- **Professional Interface**: Modern, minimalist dark theme designed for productivity
-- **Real-time Processing**: Instant document analysis and intelligent query responses
-
-## 🚀 Technology Stack
-
-### Backend
-- **FastAPI** - High-performance Python web framework
-- **OpenAI GPT-4** - Advanced language model integration
-- **PyPDF2** - Professional PDF text extraction
-- **FAISS** - Efficient vector similarity search
-- **Docker** - Containerized deployment
-
-### Frontend
-- **React** - Modern, responsive user interface
-- **Material-UI** - Professional component library
-- **Dark Theme** - Sophisticated, eye-friendly interface
-- **Responsive Design** - Optimized for all devices
-
-## 🎯 Use Cases
-
-- **Document Analysis**: Extract insights from research papers, reports, and documents
-- **Content Research**: Intelligent search and analysis of large document collections
-- **Professional Workflows**: Streamline document review and information extraction
-- **Knowledge Management**: Organize and query document repositories effectively
-
-## 🛠️ Quick Start
-
-### Prerequisites
-- Docker and Docker Compose
-- OpenAI API key (or compatible alternative)
-
-### Installation
-```bash
-# Clone the repository
-git clone <repository-url>
-cd nexus
-
-# Set your API credentials
-export OPENAI_API_KEY="your-api-key"
-export OPENAI_BASE_URL="https://api.openai.com/v1"  # or your provider
-
-# Start the platform
-docker-compose up -d
-
-# Access the interface
-open http://localhost:3000
-```
-
-## 📖 Usage
-
-1. **Upload Documents**: Drag and drop your documents (PDF, TXT, DOC, DOCX)
-2. **Intelligent Analysis**: Ask questions about your documents in natural language
-3. **Get Insights**: Receive AI-powered responses based on document content
-4. **Professional Results**: Clean, actionable insights for your workflow
-
-## 🔧 Configuration
-
-### API Setup
-```bash
-# Set OpenAI API key via API
-curl -X POST "http://localhost:8000/set-openai-key" \
-     -H "Content-Type: application/json" \
-     -d '{"api_key": "your-api-key", "base_url": "your-base-url"}'
-```
-
-### Environment Variables
-```bash
-OPENAI_API_KEY=your-api-key
-OPENAI_BASE_URL=https://api.openai.com/v1
-```
+- **🎯 Intelligent Document Analysis** - Powered by OpenAI GPT-4
+- **📁 Multi-Format Support** - PDF, TXT, DOC, DOCX
+- **🤖 AI-Powered Chat** - Ask questions about your documents
+- **🎨 Modern UI** - Clean, minimal, dark theme
+- **📱 Responsive Design** - Works on all devices
+- **🚀 Docker Ready** - Easy deployment and scaling
 
 ## 🏗️ Architecture
 
-- **Modular Design**: Clean separation of concerns with dedicated modules
-- **Scalable Backend**: FastAPI with async processing capabilities
-- **Modern Frontend**: React-based interface with professional styling
-- **Containerized**: Docker-based deployment for consistency
+- **Frontend**: React + Material-UI
+- **Backend**: FastAPI + Python
+- **AI Engine**: OpenAI GPT-4 with RAG
+- **Database**: FAISS for document indexing
+- **Deployment**: Docker + Docker Compose
 
-## 📊 Performance
+## 🚀 Quick Start
 
-- **Fast Processing**: Optimized document processing pipeline
-- **Efficient Search**: Advanced retrieval algorithms for quick responses
-- **Real-time Updates**: Instant feedback and processing status
-- **Resource Optimized**: Minimal resource footprint with maximum performance
+### Prerequisites
+- Docker (20.10+)
+- Docker Compose (2.0+)
 
-## 🔒 Security
-
-- **API Key Management**: Secure credential handling
-- **Document Privacy**: Local processing with optional cloud AI integration
-- **Access Control**: Configurable security settings
-- **Data Protection**: No document storage in external systems
-
-## 🚀 Deployment
-
-### Production
+### 1. Clone Repository
 ```bash
-# Production deployment
-docker-compose -f docker-compose.prod.yml up -d
-
-# Environment configuration
-cp .env.example .env
-# Edit .env with production values
+git clone <your-repo-url>
+cd nexus
 ```
 
-### Development
+### 2. Configure Environment
 ```bash
-# Development setup
-docker-compose up -d
+cp env.example .env
+# Edit .env with your OpenAI API key
+```
 
-# Backend development
+### 3. Start Services
+```bash
+docker-compose up -d --build
+```
+
+### 4. Access Platform
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+
+## 🔧 Configuration
+
+### Environment Variables
+```bash
+OPENAI_API_KEY=your-api-key-here
+OPENAI_BASE_URL=https://api.a4f.co/v1
+API_HOST=0.0.0.0
+API_PORT=8000
+```
+
+### API Endpoints
+- `POST /upload` - Upload documents
+- `POST /chat` - Chat with AI about documents
+- `GET /health` - Health check
+- `POST /set-openai-key` - Configure API key
+
+## 🎨 Customization
+
+### Branding
+- Replace `frontend/public/LOGO.jpg` with your logo
+- Replace `frontend/public/INTRO.mp4` with your intro video
+- Update colors in theme configuration
+
+### Styling
+- Main colors: `#1B1B1B`, `#242424`, `#374151`
+- Accent colors: `#9CA3AF`, `#6B7280`
+- Typography: Inter font family
+
+## 🐳 Docker Commands
+
+```bash
+# Build and start
+docker-compose up -d --build
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Rebuild specific service
+docker-compose build frontend --no-cache
+```
+
+## 📚 Development
+
+### Local Development
+```bash
+# Backend
 cd backend
 pip install -r requirements.txt
 uvicorn main:app --reload
 
-# Frontend development
+# Frontend
 cd frontend
 npm install
 npm start
 ```
 
-## 🧪 Testing
-
+### Testing
 ```bash
-# Run backend tests
-cd backend
-pytest
+# Backend tests
+cd backend && python -m pytest
 
-# Run frontend tests
-cd frontend
-npm test
-
-# Run integration tests
-docker-compose exec backend pytest tests/
+# Frontend tests
+cd frontend && npm test
 ```
 
-## 📈 Monitoring
+## 🌐 Production Deployment
 
-- **Health Checks**: Built-in endpoint monitoring
-- **Performance Metrics**: Response time and processing statistics
-- **Error Logging**: Comprehensive error tracking and reporting
-- **Status Dashboard**: Real-time system status monitoring
+### 1. Production Environment
+```bash
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+### 2. Nginx Configuration
+- Use provided `nginx.prod.conf`
+- Configure SSL certificates
+- Set up domain and DNS
+
+### 3. Environment Variables
+```bash
+NODE_ENV=production
+REACT_APP_API_URL=https://your-domain.com/api
+OPENAI_API_KEY=your-production-key
+```
+
+## 📊 Monitoring
+
+### Health Checks
+```bash
+curl http://localhost:8000/health
+docker-compose ps
+docker-compose logs -f
+```
+
+### Performance
+- RAG engine with configurable chunk size
+- OpenAI API integration with fallback
+- Automatic document processing
+
+## 🚨 Troubleshooting
+
+### Common Issues
+1. **Port conflicts**: Check if ports 3000/8000 are free
+2. **API key issues**: Verify OpenAI configuration
+3. **Frontend not loading**: Rebuild frontend container
+4. **File upload errors**: Check file size and format
+
+### Logs
+```bash
+# Backend logs
+docker-compose logs backend
+
+# Frontend logs
+docker-compose logs frontend
+
+# All logs
+docker-compose logs -f
+```
 
 ## 🤝 Contributing
 
-We welcome contributions from professionals who share our vision for intelligent document analysis.
-
-### Development Guidelines
-- Follow professional coding standards
-- Maintain comprehensive documentation
-- Include tests for new features
-- Follow the established architecture patterns
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🏆 Credits
+## 🆘 Support
 
-Built with modern technologies and designed for professionals who demand excellence in document analysis and AI-powered insights.
+- Check the [Deployment Guide](DEPLOYMENT.md)
+- Review [troubleshooting section](#-troubleshooting)
+- Open an issue on GitHub
 
 ---
 
-**NEXUS** - Where intelligence meets your documents.
+**NEXUS Platform** - Where intelligence meets your documents 🚀
+
+Built with ❤️ using React, FastAPI, and OpenAI
 
 

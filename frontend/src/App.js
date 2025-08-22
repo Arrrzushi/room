@@ -6,27 +6,20 @@ import Header from './components/Header';
 import FileUpload from './components/FileUpload';
 import Chat from './components/Chat';
 
-// Create a dark, professional theme
-const darkTheme = createTheme({
+// Create a minimal, clean theme
+const cleanTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#6366f1',
-      light: '#818cf8',
-      dark: '#4f46e5',
-    },
-    secondary: {
-      main: '#8b5cf6',
-      light: '#a78bfa',
-      dark: '#7c3aed',
+      main: '#ffffff',
     },
     background: {
-      default: '#0f0f23',
-      paper: '#1a1a2e',
+      default: '#1B1B1B',
+      paper: '#242424',
     },
     text: {
-      primary: '#f8fafc',
-      secondary: '#cbd5e1',
+      primary: '#ffffff',
+      secondary: '#9CA3AF',
     },
   },
   typography: {
@@ -36,32 +29,22 @@ const darkTheme = createTheme({
       letterSpacing: '0.1em',
     },
     h2: {
-      fontWeight: 700,
+      fontWeight: 800,
       letterSpacing: '0.05em',
     },
     h3: {
-      fontWeight: 600,
+      fontWeight: 700,
       letterSpacing: '0.05em',
     },
     h4: {
-      fontWeight: 600,
-      letterSpacing: '0.05em',
-    },
-    h5: {
-      fontWeight: 500,
-      letterSpacing: '0.05em',
-    },
-    h6: {
-      fontWeight: 500,
+      fontWeight: 700,
       letterSpacing: '0.05em',
     },
     body1: {
       fontWeight: 400,
-      letterSpacing: '0.02em',
     },
     body2: {
       fontWeight: 400,
-      letterSpacing: '0.02em',
     },
   },
   components: {
@@ -71,15 +54,14 @@ const darkTheme = createTheme({
           textTransform: 'none',
           borderRadius: '8px',
           fontWeight: 600,
-          letterSpacing: '0.05em',
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          background: '#1a1a2e',
-          border: '1px solid #334155',
+          background: '#242424',
+          border: '1px solid #374151',
           borderRadius: '12px',
         },
       },
@@ -87,8 +69,8 @@ const darkTheme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          background: '#1a1a2e',
-          border: '1px solid #334155',
+          background: '#242424',
+          border: '1px solid #374151',
         },
       },
     },
@@ -105,7 +87,7 @@ function App() {
 
   if (showIntro) {
     return (
-      <ThemeProvider theme={darkTheme}>
+      <ThemeProvider theme={cleanTheme}>
         <CssBaseline />
         <Intro onEnter={handleEnterPlatform} />
       </ThemeProvider>
@@ -113,13 +95,113 @@ function App() {
   }
 
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={cleanTheme}>
       <CssBaseline />
-      <Box sx={{ minHeight: '100vh', background: '#0f0f23' }}>
+      <Box sx={{ minHeight: '100vh', background: '#1B1B1B' }}>
         <Header />
-        <Box sx={{ p: 3 }}>
-          <FileUpload onFilesUploaded={setUploadedFiles} />
-          <Chat uploadedFiles={uploadedFiles} />
+        
+        {/* Hero Section */}
+        <Box sx={{ textAlign: 'center', py: 20, borderBottom: '1px solid #374151' }}>
+          <Box
+            component="h2"
+            sx={{
+              fontSize: { xs: '2.5rem', md: '4rem' },
+              fontWeight: 800,
+              color: 'white',
+              mb: 2,
+              letterSpacing: 'tight',
+            }}
+          >
+            Upload & Analyze Documents Intelligently
+          </Box>
+          <Box
+            component="p"
+            sx={{
+              color: '#9CA3AF',
+              maxWidth: 'xl',
+              mx: 'auto',
+              fontSize: '1.125rem',
+            }}
+          >
+            A minimal, modern way to get insights from your files.
+          </Box>
+        </Box>
+
+        {/* Upload Section */}
+        <Box sx={{ maxWidth: '5xl', mx: 'auto', py: 16, px: 6, borderBottom: '1px solid #374151' }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { md: '1fr 1fr' }, gap: 12 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <Box
+                component="h3"
+                sx={{
+                  fontSize: '1.25rem',
+                  fontWeight: 600,
+                  mb: 2,
+                  color: 'white',
+                }}
+              >
+                Upload Documents
+              </Box>
+              <Box
+                component="p"
+                sx={{
+                  color: '#9CA3AF',
+                  fontSize: '0.875rem',
+                  mb: 6,
+                }}
+              >
+                Drag & drop your files here or click to browse. Supported formats: PDF, TXT, DOC, DOCX.
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <FileUpload onFilesUploaded={setUploadedFiles} />
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Document Analysis */}
+        <Box sx={{ maxWidth: '5xl', mx: 'auto', py: 16, px: 6 }}>
+          <Box
+            component="h3"
+            sx={{
+              fontSize: '1.5rem',
+              fontWeight: 600,
+              color: 'white',
+              mb: 6,
+            }}
+          >
+            Document Analysis
+          </Box>
+          <Box sx={{ mb: 6 }}>
+            <Chat uploadedFiles={uploadedFiles} />
+          </Box>
+        </Box>
+
+        {/* Footer */}
+        <Box
+          component="footer"
+          sx={{
+            textAlign: 'center',
+            py: 8,
+            borderTop: '1px solid #374151',
+            color: '#6B7280',
+            fontSize: '0.875rem',
+          }}
+        >
+          <a 
+            href="https://github.com/Arrrzushi" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{
+              color: '#6B7280',
+              textDecoration: 'none',
+              transition: 'color 0.2s ease',
+            }}
+            onMouseEnter={(e) => e.target.style.color = '#9CA3AF'}
+            onMouseLeave={(e) => e.target.style.color = '#6B7280'}
+          >
+            NEXUS — Built by Arushi
+          </a>
         </Box>
       </Box>
     </ThemeProvider>
