@@ -47,15 +47,14 @@ docker-compose up -d --build
 ```
 
 ### 4. Access Platform
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8000
+- **Frontend**: https://room-xi-liard.vercel.app/
+- **Backend API**: https://room-production-3918.up.railway.app/
 
 ## 🔧 Configuration
 
 ### Environment Variables
 ```bash
 OPENAI_API_KEY=your-api-key-here
-OPENAI_BASE_URL=https://api.a4f.co/v1
 API_HOST=0.0.0.0
 API_PORT=8000
 ```
@@ -183,16 +182,10 @@ docker-compose logs -f
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
-
-- Check the [Deployment Guide](DEPLOYMENT.md)
-- Review [troubleshooting section](#-troubleshooting)
-- Open an issue on GitHub
-
 ---
 
 **NEXUS Platform** - Where intelligence meets your documents 🚀
 
-Built with ❤️ using React, FastAPI, and OpenAI
+Built with so much ❤️ using React, FastAPI, and OpenAI
 
 
