@@ -13,9 +13,9 @@ from room_translate.translator import RoomTranslator
 from room_voice.processor import RoomVoice
 
 app = FastAPI(
-    title="Room - The Multilingual Cute AI Assistant",
-    description="A friendly AI that helps you chat with your documents in multiple languages",
-    version="1.0.0"
+    title="NEXUS - Intelligent Document Analysis Platform",
+    description="A sophisticated AI-powered document analysis and retrieval system for professionals",
+    version="2.0.0"
 )
 
 # CORS middleware
@@ -57,14 +57,14 @@ class ApiKeyRequest(BaseModel):
 @app.get("/")
 async def root():
     """Root endpoint."""
-    return {"message": "Welcome to Room AI Assistant! 🏠"}
+    return {"message": "Welcome to NEXUS - Where intelligence meets your documents"}
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
     return {
         "status": "healthy",
-        "message": "Room AI Assistant is running smoothly!",
+        "message": "NEXUS is running smoothly!",
         "services": {
             "rag": "available",
             "translation": "available", 

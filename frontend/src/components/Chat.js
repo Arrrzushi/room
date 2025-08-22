@@ -1,34 +1,102 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   TextField,
   Button,
-  Paper,
   Typography,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
   Avatar,
   IconButton,
   Chip,
-  CircularProgress,
-  Alert,
+  Divider,
 } from '@mui/material';
-import { Send, Mic, MicOff, Language } from '@mui/icons-material';
-import { useTheme } from '@mui/material/styles';
+import { Send as SendIcon, Upload as UploadIcon } from '@mui/icons-material';
+import { styled } from '@mui/material/styles';
 
-const Chat = () => {
-  const theme = useTheme();
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      text: "Hi! I'm Roomy, your cute AI assistant! 🏠 I can help you chat with your documents. Upload a document and start asking questions!",
-      sender: 'ai',
-      timestamp: new Date(),
+const ChatContainer = styled(Box)(({ theme }) => ({
+  height: '600px',
+  display: 'flex',
+  flexDirection: 'column',
+  background: '#1a1a2e',
+  border: '1px solid #334155',
+  borderRadius: '12px',
+  overflow: 'hidden',
+}));
+
+const MessagesContainer = styled(Box)(({ theme }) => ({
+  flex: 1,
+  overflowY: 'auto',
+  padding: theme.spacing(2),
+  background: '#0f0f23',
+  '&::-webkit-scrollbar': {
+    width: '8px',
+  },
+  '&::-webkit-scrollbar-track': {
+    background: '#1a1a2e',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    background: '#334155',
+    borderRadius: '4px',
+  },
+}));
+
+const MessageBubble = styled(Box)(({ theme, isUser }) => ({
+  display: 'flex',
+  justifyContent: isUser ? 'flex-end' : 'flex-start',
+  marginBottom: theme.spacing(2),
+}));
+
+const MessageContent = styled(Box)(({ theme, isUser }) => ({
+  maxWidth: '70%',
+  padding: theme.spacing(2),
+  borderRadius: '16px',
+  background: isUser 
+    ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' 
+    : '#1a1a2e',
+  color: isUser ? 'white' : '#f8fafc',
+  border: isUser ? 'none' : '1px solid #334155',
+  boxShadow: isUser 
+    ? '0 4px 20px rgba(99, 102, 241, 0.3)' 
+    : '0 2px 10px rgba(0, 0, 0, 0.2)',
+}));
+
+const InputContainer = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+  background: '#1a1a2e',
+  borderTop: '1px solid #334155',
+  display: 'flex',
+  gap: theme.spacing(1),
+}));
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': {
+      borderColor: '#334155',
     },
-  ]);
-  const [inputText, setInputText] = useState('');
+    '&:hover fieldset': {
+      borderColor: '#6366f1',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#8b5cf6',
+    },
+  },
+  '& .MuiInputBase-input': {
+    color: '#f8fafc',
+  },
+  '& .MuiInputLabel-root': {
+    color: '#94a3b8',
+  },
+}));
+
+const Chat = ({ uploadedFiles }) => {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [language, setLanguage] = useState('en');
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState('en');
-  const [useVoice, setUseVoice] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState([]);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -39,18 +107,31 @@ const Chat = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async () => {
-    if (!inputText.trim()) return;
+  useEffect(() => {
+    if (uploadedFiles.length > 0) {
+      setMessages([
+        {
+          id: Date.now(),
+          text: `Welcome to NEXUS! I've processed ${uploadedFiles.length} document(s). Ask me anything about your documents.`,
+          isUser: false,
+          timestamp: new Date(),
+        },
+      ]);
+    }
+  }, [uploadedFiles]);
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
 
     const userMessage = {
       id: Date.now(),
-      text: inputText,
-      sender: 'user',
+      text: input,
+      isUser: true,
       timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setInputText('');
+    setInput('');
     setIsLoading(true);
 
     try {
@@ -60,31 +141,28 @@ const Chat = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: inputText,
-          language: selectedLanguage,
-          use_voice: useVoice,
+          message: input,
+          language: language,
+          use_voice: false,
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const aiMessage = {
-          id: Date.now() + 1,
-          text: data.response,
-          sender: 'ai',
-          timestamp: new Date(),
-          voice_url: data.voice_url,
-        };
-        setMessages(prev => [...prev, aiMessage]);
-      } else {
-        throw new Error('Failed to get response');
-      }
+      const data = await response.json();
+      
+      const aiMessage = {
+        id: Date.now() + 1,
+        text: data.response,
+        isUser: false,
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
       const errorMessage = {
         id: Date.now() + 1,
-        text: "Sorry, I'm having trouble right now. Please try again! 😅",
-        sender: 'ai',
+        text: 'Sorry, I encountered an error. Please try again.',
+        isUser: false,
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -96,153 +174,122 @@ const Chat = () => {
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      handleSend();
     }
   };
 
-  const toggleVoice = () => {
-    setUseVoice(!useVoice);
-  };
-
-  const getLanguageLabel = (lang) => {
-    return lang === 'en' ? 'English' : 'Hindi';
-  };
-
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Language and Voice Controls */}
-      <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', gap: 2, alignItems: 'center' }}>
-        <Chip
-          icon={<Language />}
-          label={getLanguageLabel(selectedLanguage)}
-          onClick={() => setSelectedLanguage(selectedLanguage === 'en' ? 'hi' : 'en')}
-          color="primary"
-          variant="outlined"
-        />
-        <IconButton
-          onClick={toggleVoice}
-          color={useVoice ? 'primary' : 'default'}
-          title={useVoice ? 'Voice enabled' : 'Voice disabled'}
-        >
-          {useVoice ? <Mic /> : <MicOff />}
-        </IconButton>
-        {useVoice && (
-          <Typography variant="caption" color="text.secondary">
-            Voice features coming soon!
-          </Typography>
-        )}
-      </Box>
-
-      {/* Messages */}
-      <Box sx={{ flex: 1, overflow: 'auto', p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {messages.map((message) => (
-          <Box
-            key={message.id}
-            sx={{
-              display: 'flex',
-              justifyContent: message.sender === 'user' ? 'flex-end' : 'flex-start',
-              mb: 2,
-            }}
-          >
-            <Paper
-              sx={{
-                p: 2,
-                maxWidth: '70%',
-                backgroundColor: message.sender === 'user' 
-                  ? theme.palette.primary.main 
-                  : theme.palette.background.paper,
-                color: message.sender === 'user' 
-                  ? theme.palette.primary.contrastText 
-                  : theme.palette.text.primary,
-                borderRadius: 3,
-                position: 'relative',
-              }}
-            >
-              {message.sender === 'ai' && (
-                <Avatar
-                  src="/roomy-avatar.svg"
-                  alt="Roomy"
-                  sx={{
-                    width: 24,
-                    height: 24,
-                    position: 'absolute',
-                    top: -12,
-                    left: -12,
-                    bgcolor: 'primary.main',
-                  }}
-                />
-              )}
-              <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
-                {message.text}
-              </Typography>
-              {message.voice_url && (
-                <Box sx={{ mt: 1 }}>
-                  <audio controls src={message.voice_url} style={{ width: '100%' }} />
-                </Box>
-              )}
-              <Typography
-                variant="caption"
+    <ChatContainer>
+      <Box sx={{ p: 2, background: '#1a1a2e', borderBottom: '1px solid #334155' }}>
+        <Typography variant="h6" sx={{ color: '#f8fafc', fontWeight: 600 }}>
+          Document Analysis
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#94a3b8', mt: 0.5 }}>
+          Ask NEXUS about your uploaded documents
+        </Typography>
+        
+        {uploadedFiles.length > 0 && (
+          <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            {uploadedFiles.map((file, index) => (
+              <Chip
+                key={index}
+                icon={<UploadIcon />}
+                label={file.name}
+                size="small"
                 sx={{
-                  display: 'block',
-                  mt: 1,
-                  opacity: 0.7,
-                  textAlign: 'right',
+                  background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                  color: 'white',
+                  fontWeight: 500,
                 }}
-              >
-                {message.timestamp.toLocaleTimeString()}
-              </Typography>
-            </Paper>
-          </Box>
-        ))}
-        
-        {isLoading && (
-          <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2 }}>
-            <Paper sx={{ p: 2, borderRadius: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <CircularProgress size={20} />
-                <Typography variant="body2">Roomy is thinking...</Typography>
-              </Box>
-            </Paper>
+              />
+            ))}
           </Box>
         )}
-        
-        <div ref={messagesEndRef} />
       </Box>
 
-      {/* Input Area */}
-      <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <TextField
-            fullWidth
-            multiline
-            maxRows={4}
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder={`Ask me anything in ${getLanguageLabel(selectedLanguage)}...`}
-            variant="outlined"
-            size="small"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 3,
-              },
-            }}
-          />
-          <Button
-            variant="contained"
-            onClick={handleSendMessage}
-            disabled={!inputText.trim() || isLoading}
-            sx={{
-              borderRadius: 3,
-              minWidth: 56,
-              height: 40,
-            }}
-          >
-            <Send />
-          </Button>
-        </Box>
-      </Box>
-    </Box>
+      <MessagesContainer>
+        {messages.length === 0 ? (
+          <Box sx={{ textAlign: 'center', py: 4 }}>
+            <Typography variant="h6" sx={{ color: '#94a3b8', mb: 1 }}>
+              Welcome to NEXUS
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#64748b' }}>
+              Upload documents and start asking questions to get intelligent insights.
+            </Typography>
+          </Box>
+        ) : (
+          <List>
+            {messages.map((message) => (
+              <ListItem key={message.id} sx={{ padding: 0 }}>
+                <MessageBubble isUser={message.isUser}>
+                  <MessageContent isUser={message.isUser}>
+                    <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
+                      {message.text}
+                    </Typography>
+                    <Typography 
+                      variant="caption" 
+                      sx={{ 
+                        color: message.isUser ? 'rgba(255,255,255,0.7)' : '#64748b',
+                        mt: 1,
+                        display: 'block'
+                      }}
+                    >
+                      {message.timestamp.toLocaleTimeString()}
+                    </Typography>
+                  </MessageContent>
+                </MessageBubble>
+              </ListItem>
+            ))}
+            {isLoading && (
+              <ListItem sx={{ padding: 0 }}>
+                <MessageBubble isUser={false}>
+                  <MessageContent isUser={false}>
+                    <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+                      NEXUS is analyzing your request...
+                    </Typography>
+                  </MessageContent>
+                </MessageBubble>
+              </ListItem>
+            )}
+            <div ref={messagesEndRef} />
+          </List>
+        )}
+      </MessagesContainer>
+
+      <InputContainer>
+        <StyledTextField
+          fullWidth
+          variant="outlined"
+          placeholder="Ask NEXUS about your documents..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyPress={handleKeyPress}
+          disabled={isLoading}
+          multiline
+          maxRows={3}
+        />
+        <Button
+          variant="contained"
+          onClick={handleSend}
+          disabled={!input.trim() || isLoading}
+          sx={{
+            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+            color: 'white',
+            px: 3,
+            minWidth: 'auto',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
+            },
+            '&:disabled': {
+              background: '#334155',
+              color: '#64748b',
+            },
+          }}
+        >
+          <SendIcon />
+        </Button>
+      </InputContainer>
+    </ChatContainer>
   );
 };
 

@@ -1,44 +1,24 @@
 services:
-  backend:
-    build: 
-      context: ./backend
-      dockerfile: Dockerfile
+  nexus-backend:
+    build: ./backend
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
-      - model_cache:/app/models
-      - audio_data:/app/static/audio
+      - ./uploads:/app/uploads
     environment:
-      - PYTHONUNBUFFERED=1
-      - CUDA_VISIBLE_DEVICES=-1
-      - MODEL_CACHE_DIR=/app/models
-      - LOG_LEVEL=INFO
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
-    restart: unless-stopped
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+  nexus-frontend:
+    build: ./frontend
     ports:
       - "3000:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    environment:
-      - REACT_APP_API_URL=http://localhost:8000
-      - NODE_ENV=production
     depends_on:
-      backend:
-        condition: service_healthy
-    restart: unless-stopped
+      - nexus-backend
 
 volumes:
-  model_cache:
-  audio_data:
+  uploads:

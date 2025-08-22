@@ -1,17 +1,27 @@
 {
-  "short_name": "Room",
-  "name": "Room - The Multilingual Cute AI Assistant",
+  "short_name": "NEXUS",
+  "name": "NEXUS - Intelligent Document Analysis Platform",
   "icons": [
     {
-      "src": "roomy-logo.svg",
-      "sizes": "any",
+      "src": "nexus-logo.svg",
+      "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/svg+xml"
+    },
+    {
+      "src": "nexus-logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192"
+    },
+    {
+      "src": "nexus-logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#FF9999",
-  "background_color": "#FFF5F5"
+  "theme_color": "#000000",
+  "background_color": "#121212"
 }
 
 

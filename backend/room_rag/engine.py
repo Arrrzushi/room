@@ -217,7 +217,7 @@ class RoomRAG:
             context = "\n\n".join([f"Context {i+1}: {chunk}" for i, chunk in enumerate(relevant_chunks)])
             
             # Create a comprehensive prompt
-            system_prompt = """You are Roomy, a helpful AI assistant that analyzes documents and provides clear, accurate answers. 
+            system_prompt = """You are NEXUS, a sophisticated AI assistant that analyzes documents and provides clear, accurate answers. 
             
 Your task is to:
 1. Understand the user's question

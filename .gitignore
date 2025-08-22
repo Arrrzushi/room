@@ -1,3 +1,11 @@
+# NEXUS Platform - Git Ignore File
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
 # Python
 __pycache__/
 *.py[cod]
@@ -25,8 +33,7 @@ MANIFEST
 venv/
 env/
 ENV/
-env.bak/
-venv.bak/
+.venv/
 
 # Node.js
 node_modules/
@@ -34,40 +41,25 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+.pnpm-debug.log*
 
 # React build
-build/
-dist/
+frontend/build/
+frontend/dist/
 
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# Docker
+.dockerignore
+docker-compose.override.yml
 
 # Logs
-*.log
 logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Runtime data
-pids
+pids/
 *.pid
 *.seed
 *.pid.lock
@@ -103,6 +95,9 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
+# dotenv environment variables file
+.env.test
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
@@ -126,15 +121,70 @@ public
 tmp/
 temp/
 
-# AI Models and Data
-backend/models/
-backend/room_rag/storage/
-backend/room_translate/models/
-backend/room_voice/models/
-backend/static/audio/
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# Database
-*.db
-*.sqlite3
-*.sqlite
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# NEXUS specific
+uploads/
+models/
+*.faiss
+*.pkl
+*.h5
+*.onnx
+
+# Test coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
 

@@ -1,77 +1,117 @@
-# Room AI Assistant Makefile
+# NEXUS Platform Makefile
+# Commands for managing the NEXUS Intelligent Document Analysis Platform
 
-.PHONY: help install-dev install-prod start-dev start-prod stop clean test lint format
+.PHONY: help build up down restart logs clean test lint format
 
-help: ## Show this help message
-	@echo "Room AI Assistant - Available Commands:"
+# Default target
+help:
+	@echo "🚀 NEXUS Platform - Available Commands:"
 	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	@echo "📦 Build & Deploy:"
+	@echo "  build     - Build all Docker images"
+	@echo "  up        - Start all services"
+	@echo "  down      - Stop all services"
+	@echo "  restart   - Restart all services"
+	@echo ""
+	@echo "🔍 Monitoring:"
+	@echo "  logs      - Show service logs"
+	@echo "  status    - Show service status"
+	@echo "  health    - Check service health"
+	@echo ""
+	@echo "🧹 Maintenance:"
+	@echo "  clean     - Remove all containers and images"
+	@echo "  prune     - Clean up unused Docker resources"
+	@echo ""
+	@echo "🛠️  Development:"
+	@echo "  test      - Run tests"
+	@echo "  lint      - Run linting"
+	@echo "  format    - Format code"
+	@echo ""
+	@echo "📚 Documentation:"
+	@echo "  docs      - Generate documentation"
 
-install-dev: ## Install development dependencies
-	@echo "Installing development dependencies..."
-	cd backend && python -m venv venv
-	cd backend && source venv/bin/activate && pip install -r requirements.txt
-	cd frontend && npm install
+# Build all Docker images
+build:
+	@echo "🔨 Building NEXUS Platform images..."
+	docker-compose build --no-cache
 
-install-prod: ## Install production dependencies
-	@echo "Installing production dependencies..."
-	docker-compose build
-
-start-dev: ## Start development servers
-	@echo "Starting development servers..."
-	@echo "Starting backend..."
-	cd backend && source venv/bin/activate && uvicorn main:app --reload --port 8000 &
-	@echo "Starting frontend..."
-	cd frontend && npm start &
-	@echo "Development servers started!"
-	@echo "Backend: http://localhost:8000"
-	@echo "Frontend: http://localhost:3000"
-
-start-prod: ## Start production servers with Docker
-	@echo "Starting production servers..."
+# Start all services
+up:
+	@echo "🚀 Starting NEXUS Platform..."
 	docker-compose up -d
-	@echo "Production servers started!"
-	@echo "Frontend: http://localhost:3000"
-	@echo "Backend: http://localhost:8000"
+	@echo "✅ NEXUS Platform is starting up!"
+	@echo "📍 Frontend: http://localhost:3000"
+	@echo "📍 Backend: http://localhost:8000"
 
-stop: ## Stop all servers
-	@echo "Stopping servers..."
+# Stop all services
+down:
+	@echo "🛑 Stopping NEXUS Platform..."
 	docker-compose down
-	@echo "Servers stopped!"
+	@echo "✅ NEXUS Platform stopped"
 
-clean: ## Clean up generated files and containers
-	@echo "Cleaning up..."
-	docker-compose down -v --remove-orphans
-	docker system prune -f
-	cd backend && rm -rf venv __pycache__ room_rag/storage/* room_translate/models/* room_voice/models/* static/audio/*
-	cd frontend && rm -rf node_modules build
-	@echo "Cleanup complete!"
+# Restart all services
+restart: down up
 
-test: ## Run tests
-	@echo "Running tests..."
-	cd backend && source venv/bin/activate && pytest -v
-	cd frontend && npm test -- --watchAll=false
-
-lint: ## Run linting
-	@echo "Running linting..."
-	cd backend && source venv/bin/activate && flake8 .
-	cd frontend && npm run lint
-
-format: ## Format code
-	@echo "Formatting code..."
-	cd backend && source venv/bin/activate && black . && isort .
-	cd frontend && npm run format
-
-logs: ## Show logs
-	@echo "Showing logs..."
+# Show service logs
+logs:
+	@echo "📋 NEXUS Platform logs:"
 	docker-compose logs -f
 
-health: ## Check service health
-	@echo "Checking service health..."
-	@curl -f http://localhost:8000/health || echo "Backend not responding"
-	@curl -f http://localhost:3000 || echo "Frontend not responding"
+# Show service status
+status:
+	@echo "📊 NEXUS Platform status:"
+	docker-compose ps
 
-setup: install-dev ## Setup development environment
-	@echo "Development environment setup complete!"
-	@echo "Run 'make start-dev' to start development servers"
+# Check service health
+health:
+	@echo "🏥 Checking NEXUS Platform health..."
+	@curl -f http://localhost:8000/health || echo "❌ Backend is not healthy"
+
+# Clean up all containers and images
+clean:
+	@echo "🧹 Cleaning up NEXUS Platform..."
+	docker-compose down -v --rmi all
+	docker system prune -f
+	@echo "✅ Cleanup complete"
+
+# Clean up unused Docker resources
+prune:
+	@echo "🧹 Pruning unused Docker resources..."
+	docker system prune -f
+	@echo "✅ Pruning complete"
+
+# Run tests
+test:
+	@echo "🧪 Running NEXUS Platform tests..."
+	cd backend && python -m pytest tests/ -v
+
+# Run linting
+lint:
+	@echo "🔍 Running NEXUS Platform linting..."
+	cd backend && flake8 . --max-line-length=100
+	cd frontend && npm run lint
+
+# Format code
+format:
+	@echo "✨ Formatting NEXUS Platform code..."
+	cd backend && black . && isort .
+	cd frontend && npm run format
+
+# Generate documentation
+docs:
+	@echo "📚 Generating NEXUS Platform documentation..."
+	@echo "Documentation generation coming soon..."
+
+# Quick start (build and start)
+start: build up
+	@echo "🎉 NEXUS Platform is ready!"
+	@echo "📍 Frontend: http://localhost:3000"
+	@echo "📍 Backend: http://localhost:8000"
+	@echo "📍 Health: http://localhost:8000/health"
+
+# Development mode
+dev:
+	@echo "🛠️  Starting NEXUS Platform in development mode..."
+	docker-compose -f docker-compose.dev.yml up -d
+	@echo "✅ Development environment ready!"
 

@@ -1,245 +1,225 @@
-# Room AI Assistant - Project Structure
+# NEXUS Platform - Project Structure
 
-This document describes the organization and structure of the Room AI Assistant project.
+This document outlines the structure and organization of the NEXUS Intelligent Document Analysis Platform.
 
-## 📁 Directory Structure
+## 📁 Root Directory Structure
 
 ```
-room/
-├── README.md                 # Main project documentation
-├── SETUP.md                  # Setup and deployment guide
-├── PROJECT_STRUCTURE.md      # This file
-├── .gitignore               # Git ignore rules
-├── .dockerignore            # Docker ignore rules
-├── docker-compose.yml       # Docker services configuration
-├── env.example              # Environment variables template
-├── config.py                # Configuration management
-├── start.py                 # Backend startup script
-├── health_check.py          # Health check utility
-├── demo.py                  # Demo and testing script
-├── Makefile                 # Development commands
-│
-├── backend/                 # Python FastAPI backend
-│   ├── main.py             # Main FastAPI application
-│   ├── requirements.txt    # Python dependencies
-│   ├── Dockerfile         # Backend container
-│   ├── pytest.ini         # Test configuration
-│   │
-│   ├── room_rag/          # RAG (Retrieval-Augmented Generation) module
-│   │   ├── __init__.py    # Package initialization
-│   │   └── engine.py      # RAG engine implementation
-│   │
-│   ├── room_translate/    # Translation module
-│   │   ├── __init__.py    # Package initialization
-│   │   └── translator.py  # Translation engine
-│   │
-│   ├── room_voice/        # Voice processing module
-│   │   ├── __init__.py    # Package initialization
-│   │   └── processor.py   # Voice processing engine
-│   │
-│   ├── models/            # AI model storage (auto-created)
-│   ├── static/            # Static files
-│   │   └── audio/         # Generated audio files
-│   └── tests/             # Backend tests
-│       ├── test_api.py    # API endpoint tests
-│       ├── test_rag.py    # RAG functionality tests
-│       ├── test_translate.py # Translation tests
-│       └── test_voice.py  # Voice processing tests
-│
-└── frontend/               # React frontend application
-    ├── package.json        # Node.js dependencies
-    ├── Dockerfile         # Frontend container
-    │
-    ├── public/            # Static assets
-    │   ├── index.html     # Main HTML file
-    │   ├── manifest.json  # PWA manifest
-    │   ├── roomy-logo.svg # Application logo
-    │   └── roomy-avatar.svg # AI assistant avatar
-    │
-    └── src/               # React source code
-        ├── index.js       # Application entry point
-        ├── App.js         # Main application component
-        ├── theme.js       # Material-UI theme configuration
-        │
-        └── components/    # React components
-            ├── Header.js  # Application header
-            ├── Chat.js    # Chat interface
-            └── FileUpload.js # File upload component
+nexus/
+├── backend/                 # FastAPI backend application
+├── frontend/               # React frontend application
+├── uploads/                # Document upload storage
+├── docker-compose.yml      # Docker services configuration
+├── README.md               # Project documentation
+├── SETUP.md                # Setup instructions
+├── start.py                # Platform startup script
+├── config.py               # Configuration settings
+├── Makefile                # Build and management commands
+├── .env.example            # Environment variables template
+└── .gitignore             # Git ignore patterns
 ```
 
-## 🏗️ Architecture Overview
+## 🐍 Backend Structure (`backend/`)
 
-### Backend (FastAPI)
-- **FastAPI**: Modern, fast web framework for building APIs
-- **RAG Engine**: Document processing and question-answering using FAISS and sentence transformers
-- **Translation Engine**: Multilingual support using IndicTrans2 models
-- **Voice Engine**: Speech-to-text and text-to-speech using Whisper and Coqui TTS
+```
+backend/
+├── main.py                 # FastAPI application entry point
+├── requirements.txt        # Python dependencies
+├── Dockerfile             # Backend container configuration
+├── room_rag/              # RAG (Retrieval-Augmented Generation) engine
+│   ├── __init__.py
+│   └── engine.py          # Core RAG functionality with OpenAI integration
+├── room_translate/         # Translation services
+│   ├── __init__.py
+│   └── translator.py      # Multilingual support (English/Hindi)
+├── room_voice/            # Voice processing (coming soon)
+│   ├── __init__.py
+│   └── processor.py      # Voice-to-text and text-to-speech
+└── static/                # Static file serving
+    └── audio/            # Audio file storage
+```
 
-### Frontend (React)
-- **React 18**: Modern React with hooks and functional components
-- **Material-UI**: Beautiful, accessible UI components
-- **Custom Theme**: Cute, friendly design with soft colors
-- **Responsive Design**: Works on desktop and mobile devices
+### Backend Components
 
-### Key Features
-1. **Document Processing**: Upload and process PDF/text files
-2. **Multilingual Support**: English and Hindi language support
-3. **Voice Interaction**: Natural voice input/output
-4. **Modern UI**: Cute, user-friendly interface
-5. **Fast Response**: Sub-2-second response times
+- **FastAPI Application**: High-performance Python web framework
+- **RAG Engine**: OpenAI-powered document analysis and intelligent responses
+- **Translation Service**: Multi-language document processing
+- **Voice Processing**: Audio input/output capabilities (planned)
+- **File Management**: Document upload, storage, and processing
 
-## 🔧 Development Tools
+## ⚛️ Frontend Structure (`frontend/`)
 
-### Backend Development
-- **Python 3.9+**: Modern Python with async/await support
-- **FastAPI**: Auto-generated API documentation
-- **Pytest**: Comprehensive testing framework
-- **Docker**: Containerized development and deployment
+```
+frontend/
+├── public/                 # Static assets
+│   ├── index.html         # Main HTML template
+│   ├── nexus-logo.svg     # NEXUS platform logo
+│   ├── nexus-avatar.svg   # AI assistant avatar
+│   └── manifest.json      # PWA manifest
+├── src/                   # React source code
+│   ├── components/        # Reusable UI components
+│   │   ├── Intro.js       # Landing/intro page
+│   │   ├── Header.js      # Application header
+│   │   ├── FileUpload.js  # Document upload interface
+│   │   └── Chat.js        # AI chat interface
+│   ├── App.js             # Main application component
+│   ├── index.js           # Application entry point
+│   └── theme.js           # Material-UI theme configuration
+├── package.json           # Node.js dependencies
+├── Dockerfile             # Frontend container configuration
+└── nginx.conf             # Nginx configuration for production
+```
 
-### Frontend Development
-- **Node.js 16+**: Modern JavaScript runtime
-- **React Scripts**: Create React App tooling
-- **Material-UI**: Component library with theming
-- **Axios**: HTTP client for API communication
+### Frontend Components
 
-### DevOps
-- **Docker Compose**: Multi-service development environment
-- **Makefile**: Common development commands
-- **Health Checks**: Service monitoring and validation
-- **Environment Configuration**: Flexible configuration management
+- **Intro Page**: Sexy, dark-themed landing page with NEXUS branding
+- **Header**: Professional navigation with NEXUS logo and slogan
+- **File Upload**: Drag-and-drop document upload interface
+- **Chat Interface**: AI-powered document analysis chat
+- **Dark Theme**: Modern, minimalist, professional UI design
 
-## 🚀 Getting Started
+## 🐳 Docker Configuration
 
-### Quick Start (Docker)
+### Services
+
+- **nexus-backend**: FastAPI backend service (port 8000)
+- **nexus-frontend**: React frontend service (port 3000)
+
+### Volumes
+
+- **uploads**: Document storage persistence
+- **node_modules**: Frontend dependency caching
+
+## 🔧 Configuration Files
+
+### Environment Variables (`.env`)
+
 ```bash
-# Start all services
-docker-compose up -d
+# OpenAI Configuration
+OPENAI_API_KEY=your-api-key
+OPENAI_BASE_URL=https://api.openai.com/v1
 
-# Access the application
-Frontend: http://localhost:3000
-Backend: http://localhost:8000
-API Docs: http://localhost:8000/docs
+# API Settings
+API_HOST=0.0.0.0
+API_PORT=8000
+API_RELOAD=true
+
+# File Upload
+MAX_FILE_SIZE=52428800  # 50MB
+UPLOAD_DIR=./uploads
+
+# RAG Configuration
+CHUNK_SIZE=2000
+TOP_K_CHUNKS=5
 ```
 
-### Development Setup
+### Docker Compose (`docker-compose.yml`)
+
+- Service definitions for backend and frontend
+- Volume mappings for data persistence
+- Environment variable injection
+- Health checks and dependencies
+
+## 🚀 Management Commands
+
+### Makefile Commands
+
 ```bash
-# Install dependencies
-make install-dev
-
-# Start development servers
-make start-dev
-
-# Run tests
-make test
-
-# Check health
-make health
+make help      # Show available commands
+make build     # Build all Docker images
+make up        # Start all services
+make down      # Stop all services
+make restart   # Restart all services
+make logs      # Show service logs
+make status    # Show service status
+make health    # Check service health
+make clean     # Clean up containers and images
+make test      # Run tests
+make lint      # Run linting
+make format    # Format code
 ```
 
-### Available Commands
+### Python Scripts
+
+- **`start.py`**: Platform startup and health monitoring
+- **`config.py`**: Configuration management and validation
+
+## 📊 Key Features
+
+### Document Processing
+
+- **Supported Formats**: PDF, TXT, DOC, DOCX
+- **Text Extraction**: Intelligent PDF parsing and cleaning
+- **Chunking**: Smart document segmentation for analysis
+- **Storage**: Efficient document storage and retrieval
+
+### AI Capabilities
+
+- **OpenAI Integration**: GPT-4 powered responses
+- **Custom API Support**: Alternative OpenAI-compatible providers
+- **RAG Engine**: Context-aware document analysis
+- **Intelligent Responses**: Professional, accurate insights
+
+### User Experience
+
+- **Dark Theme**: Modern, professional interface
+- **Responsive Design**: Mobile and desktop optimized
+- **Drag & Drop**: Intuitive file upload
+- **Real-time Chat**: Instant AI responses
+
+## 🔒 Security Features
+
+- **API Key Management**: Secure credential handling
+- **CORS Configuration**: Configurable cross-origin policies
+- **File Validation**: Secure file type and size checking
+- **Environment Isolation**: Docker-based security
+
+## 📈 Performance Optimizations
+
+- **Async Processing**: Non-blocking API operations
+- **Efficient Search**: FAISS-based vector similarity
+- **Caching**: Model and response caching
+- **Resource Management**: Optimized Docker configurations
+
+## 🧪 Testing & Quality
+
+- **Backend Testing**: Pytest-based test suite
+- **Frontend Testing**: React testing library
+- **Code Quality**: Flake8, Black, isort
+- **Health Monitoring**: Built-in health checks
+
+## 🚀 Deployment
+
+### Production
+
 ```bash
-make help          # Show all available commands
-make install-dev   # Install development dependencies
-make start-dev     # Start development servers
-make start-prod    # Start production servers
-make stop          # Stop all servers
-make clean         # Clean up generated files
-make test          # Run tests
-make lint          # Run linting
-make format        # Format code
-make logs          # Show logs
-make health        # Check service health
+# Build and start
+make start
+
+# Or individual steps
+make build
+make up
 ```
 
-## 📚 API Endpoints
+### Development
 
-### Core Endpoints
-- `GET /health` - Service health check
-- `POST /upload` - Upload documents
-- `POST /ask` - Ask questions (text or voice)
-- `POST /voice` - Process voice input
-
-### Features
-- **Document Upload**: Support for PDF and text files
-- **Question Answering**: RAG-based document querying
-- **Language Detection**: Automatic English/Hindi detection
-- **Translation**: Seamless language translation
-- **Voice Processing**: Speech-to-text and text-to-speech
-
-## 🧪 Testing
-
-### Backend Tests
 ```bash
-cd backend
-pytest -v                    # Run all tests
-pytest --cov=.              # Run with coverage
-pytest tests/test_rag.py    # Run specific test file
+# Development mode
+make dev
+
+# Individual services
+cd backend && uvicorn main:app --reload
+cd frontend && npm start
 ```
 
-### Frontend Tests
-```bash
-cd frontend
-npm test                     # Run tests in watch mode
-npm test -- --watchAll=false # Run tests once
-```
+## 📚 Documentation
 
-## 🔍 Monitoring and Debugging
+- **README.md**: Comprehensive project overview
+- **SETUP.md**: Detailed setup instructions
+- **PROJECT_STRUCTURE.md**: This file
+- **API Documentation**: Auto-generated from FastAPI
 
-### Health Checks
-```bash
-python health_check.py       # Comprehensive health check
-python config.py             # Validate configuration
-```
+---
 
-### Demo and Testing
-```bash
-python demo.py               # Run automated demo
-python demo.py --interactive # Interactive demo mode
-```
-
-## 📦 Deployment
-
-### Docker Deployment
-```bash
-# Build and start production services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
-```
-
-### Environment Configuration
-1. Copy `env.example` to `.env`
-2. Update configuration values
-3. Restart services
-
-## 🤝 Contributing
-
-### Code Style
-- **Python**: Black formatting, isort imports
-- **JavaScript**: ESLint configuration
-- **Tests**: Comprehensive test coverage
-- **Documentation**: Clear docstrings and comments
-
-### Development Workflow
-1. Create feature branch
-2. Implement changes with tests
-3. Run linting and formatting
-4. Submit pull request
-
-## 📄 License
-
-MIT License - feel free to use and modify!
-
-## 🌟 Credits
-
-Built with love using cutting-edge AI technologies including:
-- **IndicTrans2**: Multilingual translation
-- **Whisper**: Speech recognition
-- **Coqui TTS**: Text-to-speech
-- **FAISS**: Vector similarity search
-- **Sentence Transformers**: Text embeddings
+**NEXUS Platform** - Where intelligence meets your documents.
 
